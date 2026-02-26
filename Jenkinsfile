@@ -3,6 +3,12 @@ pipeline {
 
     stages {
 
+        stage('Checkout Code') {
+            steps {
+                checkout scm
+            }
+        }
+
         stage('Build Backend Image') {
             steps {
                 sh '''
@@ -26,12 +32,10 @@ pipeline {
         stage('Deploy NGINX Load Balancer') {
             steps {
                 sh '''
-                docker network create app-network || true
                 docker rm -f nginx-lb || true
 
                 docker run -d \
                   --name nginx-lb \
-                  --network app-network \
                   -p 80:80 \
                   nginx
 
@@ -44,7 +48,7 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline executed successfully. NGINX load balancer is running.'
+            echo 'Pipeline executed successfully.'
         }
     }
 }
